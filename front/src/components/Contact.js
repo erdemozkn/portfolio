@@ -80,7 +80,7 @@ export const Contact = () => {
         }
         setErrorMessage(false);
         setIsLoading(true);
-        const response = await fetch("http://localhost:8080/api/mail", { 
+        const response = await fetch("https://erdemzkn.me/api/mail", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
