@@ -385,9 +385,16 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   margin-bottom: 30px;
 }
 
-.contact img {
-  padding-top: 50px;
+.contact .contact-img {
+  margin-top: 50px;
   animation: updown 3s linear infinite;
+}
+
+.contact .error-success-img {
+  margin-top: 50px;
+  animation: updown 3s linear infinite;
+  height: 400px;
+  width: 400px;
 }
 
 
@@ -483,6 +490,32 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 
 .contact form .error-input:focus::placeholder {
   color: #fff;
+}
+
+.contact form .success-input {
+  border: 2px solid rgba(0, 255, 0, 0.6);
+  background-color: rgba(43, 156, 43, 0.6);
+}
+
+.contact form .success-input:focus {
+  background-color: rgb(54, 173, 54);
+  color: #fff; 
+}
+
+.contact form .success-input:focus::placeholder {
+  color: #fff;
+}
+
+.contact form button.success-button::before {
+  background-color: rgb(52, 172, 36);
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.contact form button.success-button {
+  background-color: rgb(39, 138, 36);
+  color: #fff;
+  cursor: not-allowed;
 }
 
 

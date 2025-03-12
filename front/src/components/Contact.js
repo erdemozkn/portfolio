@@ -1,7 +1,9 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TrackVisibility from "react-on-screen";
 import { Col, Container, Row } from "react-bootstrap";
-import contactImg from "../assets/img/contact-img.png";
+import contactImg from "../assets/img/contact-img-resized.png";
+import errorImg from "../assets/img/error.png";
+import successImg from "../assets/img/success.png";
 import "animate.css";
 
 export const Contact = () => {
@@ -19,6 +21,7 @@ export const Contact = () => {
         content: '',
     });
     const [isSubmit, setIsSubmit] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (isSubmit) {
@@ -37,7 +40,6 @@ export const Contact = () => {
 
             const valid = !firstNameError && !lastNameError && !emailError && !contentError;
             setErrorMessage(!valid);
-            setSuccessMessage(valid);
 
             setButtonText(valid ? "Send" : "Error !!");
         }
@@ -63,7 +65,6 @@ export const Contact = () => {
 
         const valid = !firstNameError && !lastNameError && !emailError && !contentError;
         setErrorMessage(!valid);
-        setSuccessMessage(valid);
 
         setButtonText(valid ? "Send" : "Error !!");
 
@@ -78,6 +79,7 @@ export const Contact = () => {
             return;
         }
         setErrorMessage(false);
+        setIsLoading(true);
         const response = await fetch("http://localhost:8080/api/mail", { 
             method: "POST",
             headers: {
@@ -85,20 +87,42 @@ export const Contact = () => {
             },
             body: JSON.stringify(formData),
         });
-        if (response.ok) {
+        setIsLoading(false);
+        if (response.status === 201) {
             setSuccessMessage(true);
-        } else {
-            setErrorMessage(true);
+            setButtonText("Success !!");
+            setFormData({ firstName: '', lastName: '', email: '', content: '' });
+            setIsSubmit(false);
         }
-        setButtonText("Sending...");
+        else if (response.status === 400) {
+            setErrorMessage(true);
+            setButtonText("400 Error !!");
+        }
+        else {
+            setErrorMessage(true);
+            setIsEmailError(true);
+            setButtonText("No More Email !!");
+        }
+    };
 
-        // Form gönderme işlemi yapılır...
-        // Örneğin:
-        // const response = await fetch("http://localhost:8080/api/mail", { ... });
-        // ... response işleme
+    const getImageClass = () => {
+        if (successMessage) {
+            return "error-success-img animate__animated animate__fadeInLeftBig";
+        } else if (errorMessage) {
+            return "error-success-img animate__animated animate__fadeInLeftBig";
+        } else {
+            return "contact-img animate__animated animate__fadeInLeftBig";
+        }
+    };
 
-        // İşlem tamamlandıktan sonra buton metnini eski haline getiriyoruz
-        setButtonText("Send");
+    const getImage = () => {
+        if (successMessage) {
+            return successImg;
+        } else if (errorMessage) {
+            return errorImg;
+        } else {
+            return contactImg;
+        }
     };
 
     return (
@@ -109,8 +133,8 @@ export const Contact = () => {
                         <TrackVisibility>
                             {({ isVisible }) => (
                                 <img
-                                    className={isVisible ? "animate__animated animate__fadeInLeftBig" : ""}
-                                    src={contactImg}
+                                className={`${getImageClass()} ${isVisible ? "animate__animated animate__fadeInLeftBig" : ""}`}
+                                    src={getImage()}
                                     alt="Contact Us"
                                 />
                             )}
@@ -122,7 +146,7 @@ export const Contact = () => {
                                 <div className={isVisible ? "animate__animated animate__fadeIn" : ""}>
                                     <h2>Get In Touch</h2>
                                     <form
-                                        onSubmit={handleSubmit}
+                                        onSubmit={successMessage ? null : handleSubmit}
                                         className={errorMessage ? "animate__animated animate__shakeX" : ""}
                                     >
                                         <Row>
@@ -130,7 +154,7 @@ export const Contact = () => {
                                                 <input
                                                     type="text"
                                                     name="firstName"
-                                                    className={(isFirstNameError) ? "error-input" : ""}
+                                                    className={(successMessage) ? "success-input" : (isFirstNameError) ? "error-input" : ""}
                                                     placeholder="First Name"
                                                     onChange={handleInputChange}
                                                 />
@@ -139,7 +163,7 @@ export const Contact = () => {
                                                 <input
                                                     type="text"
                                                     name="lastName"
-                                                    className={(isLastNameError) ? "error-input" : ""}
+                                                    className={(successMessage) ? "success-input" : (isLastNameError) ? "error-input" : ""}
                                                     placeholder="Last Name"
                                                     onChange={handleInputChange}
                                                 />
@@ -148,7 +172,7 @@ export const Contact = () => {
                                                 <input
                                                     type="text"
                                                     name="email"
-                                                    className={(isEmailError) ? "error-input" : ""}
+                                                    className={(successMessage) ? "success-input" : (isEmailError) ? "error-input" : ""}
                                                     placeholder="Email Address"
                                                     onChange={handleInputChange}
                                                 />
@@ -157,15 +181,16 @@ export const Contact = () => {
                                                 <textarea
                                                     rows="6"
                                                     name="content"
-                                                    className={(isContentError) ? "error-input" : ""}
+                                                    className={(successMessage) ? "success-input" : (isContentError) ? "error-input" : ""}
                                                     placeholder="Message"
                                                     onChange={handleInputChange}
                                                 ></textarea>
                                                 <button
                                                     type="submit"
-                                                    className={errorMessage ? "disable" : ""}
+                                                    className={successMessage ? "success-button" : errorMessage ? "disable" : ""}
+                                                    disabled={isLoading}
                                                 >
-                                                    <span>{buttonText}</span>
+                                                    <span>{isLoading ? "Sending..." : buttonText}</span>
                                                 </button>
                                             </Col>
                                         </Row>
