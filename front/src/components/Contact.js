@@ -80,12 +80,12 @@ export const Contact = () => {
         }
         setErrorMessage(false);
         setIsLoading(true);
-        const response = await fetch("https://erdemzkn.me/api/mail", { 
+        const response = await fetch("https://api.erdemzkn.me/api/mail", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify(formData)
         });
         setIsLoading(false);
         if (response.status === 201) {
