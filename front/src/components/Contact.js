@@ -4,6 +4,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import contactImg from "../assets/img/contact-img-resized.png";
 import errorImg from "../assets/img/error.png";
 import successImg from "../assets/img/success.png";
+import emailjs from "emailjs-com";
 import "animate.css";
 
 export const Contact = () => {
@@ -71,39 +72,44 @@ export const Contact = () => {
         return valid;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmit(true);
+
         if (!isValidate()) {
             setButtonText("Error !!");
             return;
         }
+
         setErrorMessage(false);
         setIsLoading(true);
-        const response = await fetch("https://api.erdemzkn.me/api/mail", { 
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+
+        emailjs.send(
+            "service_2wgcrxm",
+            "template_a44t6fw",
+            {
+                from_name: formData.firstName + " " + formData.lastName,
+                from_email: formData.email,
+                message: formData.content
             },
-            body: JSON.stringify(formData)
-        });
-        setIsLoading(false);
-        if (response.status === 201) {
-            setSuccessMessage(true);
-            setButtonText("Success !!");
-            setFormData({ firstName: '', lastName: '', email: '', content: '' });
-            setIsSubmit(false);
-        }
-        else if (response.status === 400) {
-            setErrorMessage(true);
-            setButtonText("400 Error !!");
-        }
-        else {
-            setErrorMessage(true);
-            setIsEmailError(true);
-            setButtonText("No More Email !!");
-        }
+            "RF0ffcfebvBk5fRBy"
+        ).then(
+            () => {
+                setIsLoading(false);
+                setSuccessMessage(true);
+                setButtonText("Success !!");
+                setFormData({ firstName: '', lastName: '', email: '', content: '' });
+                setIsSubmit(false);
+            },
+            (error) => {
+                setIsLoading(false);
+                setErrorMessage(true);
+                setButtonText("Error sending !!");
+                console.error(error);
+            }
+        );
     };
+
 
     const getImageClass = () => {
         if (successMessage) {
@@ -133,7 +139,7 @@ export const Contact = () => {
                         <TrackVisibility>
                             {({ isVisible }) => (
                                 <img
-                                className={`${getImageClass()} ${isVisible ? "animate__animated animate__fadeInLeftBig" : ""}`}
+                                    className={`${getImageClass()} ${isVisible ? "animate__animated animate__fadeInLeftBig" : ""}`}
                                     src={getImage()}
                                     alt="Contact Us"
                                 />
